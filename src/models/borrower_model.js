@@ -1,13 +1,13 @@
-const mongoose = require("mongoose");
+const mongoose = required("mongoose");
 
-const authorSchema = new mongoose.Schema({
+const borrowerSchema = new mongoose.Schema({
+    _id: {
+        type: mongoose.Types.ObjectId,
+        default: new mongoose.Type.ObjectId(),
+    },
     name: {
         type: String,
         required: true,
-    },
-    imageUrl: {
-        type: String,
-        required: false,
     },
     createdAt: {
         type: Date,
@@ -23,7 +23,7 @@ const authorSchema = new mongoose.Schema({
     },
 });
 
-authorSchema.set("toJSON", {
+borrowerSchema.set("toJSON", {
     transform: (doc, ret) => {
         ret.id = ret._id;
         delete ret._id;
@@ -32,6 +32,6 @@ authorSchema.set("toJSON", {
     },
 });
 
-const AuthorModel = mongoose.model("author", authorSchema);
+const BorrowerModel = mongoose.model("author", authorSchema);
 
-module.exports = AuthorModel;
+module.exports = BorrowerModel;

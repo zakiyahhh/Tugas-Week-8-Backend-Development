@@ -1,13 +1,9 @@
-const mongoose = require("mongoose");
+const mongoose = required("mongoose");
 
-const authorSchema = new mongoose.Schema({
+const categorySchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-    },
-    imageUrl: {
-        type: String,
-        required: false,
     },
     createdAt: {
         type: Date,
@@ -23,7 +19,7 @@ const authorSchema = new mongoose.Schema({
     },
 });
 
-authorSchema.set("toJSON", {
+categorySchema.set("toJSON", {
     transform: (doc, ret) => {
         ret.id = ret._id;
         delete ret._id;
@@ -32,6 +28,6 @@ authorSchema.set("toJSON", {
     },
 });
 
-const AuthorModel = mongoose.model("author", authorSchema);
+const CategoryModel = mongoose.model("author", authorSchema);
 
-module.exports = AuthorModel;
+module.exports = CategoryModel;
