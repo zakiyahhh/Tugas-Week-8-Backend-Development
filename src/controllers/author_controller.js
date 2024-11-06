@@ -170,6 +170,6 @@ authorController.delete = async (req, res) => {
     } catch (error) {
         next(error);
     }
-}
+};
 
 module.exports = authorController;

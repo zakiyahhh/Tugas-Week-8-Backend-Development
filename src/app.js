@@ -22,7 +22,6 @@ app.use(express.json());
 app.use("/api/v1",routes);
 app.use(errorHandling);
 
-
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

@@ -1,9 +1,11 @@
-const bookModel = require("../models/book_model.js");
+const BookModel = require("../models/book_model.js");
 const {
     responseJson
 } = require("../utils/http.js");
 
-exports.insert = async (req, res, next) => {
+const bookController = {};
+
+bookController.insert = async (req, res, next) => {
     try {
         const {
             title,
@@ -11,34 +13,164 @@ exports.insert = async (req, res, next) => {
         } = req.body;
 
         if (!title) {
-            throw new Error();
+            throw {
+                name: "bad_request",
+            };
         }
 
-        const doc = await bookModel.create({
+        const result = await BookModel.create({
             title,
             totalStocks,
         });
 
         responseJson(res, {
-            book: doc
-        }, "created", 201);
+            book: result
+        }, "Book created successfully", 201);
     } catch (error) {
         next(error);
     }
 };
 
-exports.getAll = async (req, res, next) => {
+bookController.getAll = async (req, res, next) => {
     try {
-        const doc = await bookModel
-            .find({
-                isDelete: false
-            })
-            .populate("author", "_id name");
+        const result = await BookModel.find({
+            isDeleted: false
+        });
+        responseJson(res, {
+            book: result
+        }, "Book found successfully", 200);
+    } catch (error) {
+        next(error);
+    }
+};
+
+bookController.upload = async (req, res, next) => {
+    try {
+        const {
+            imageUrl,
+            id
+        } = req.body;
+
+        if (!imageUrl || !id) {
+            throw {
+                name: "bad_request"
+            };
+        }
+
+        const result = await BookModel.findByIdAndUpdate(id, {
+            imageUrl,
+        }, {
+            isDeleted: false
+        });
+
+        if (!result) {
+            throw {
+                name: "not_found"
+            }
+        }
+
+        result.imageUrl = imageUrl;
+        responseJson(res, {
+            book: result
+        }, "Book upload successfully", 200);
+    } catch (error) {
+        next(error);
+    }
+};
+
+bookController.update = async (req, res, next) => {
+    try {
+        const {
+            title
+        } = req.body;
+        const {
+            id
+        } = req.params;
+
+        if (!title || !id) {
+            throw {
+                name: "bad_request"
+            };
+        }
+
+        const result = await BookModel.findByIdAndUpdate(id, {
+            title,
+            isDeleted: false,
+        });
+
+        if (!result) {
+            throw {
+                name: "not_found"
+            }
+        }
+
+        result.title = title;
+        responseJson(res, {
+            book: result
+        }, "Book update successfully", 200);
+    } catch (error) {
+        next(error);
+    }
+};
+
+bookController.getById = async (req, res, next) => {
+    try {
+        const {
+            id
+        } = req.params;
+
+        if (!id) {
+            throw {
+                name: "bad_request"
+            };
+        }
+
+        const result = await BookModel.findById(id, {
+            isDeleted: false
+        });
+
+        if (!result) {
+            throw {
+                name: "not_found"
+            }
+        }
 
         responseJson(res, {
-            books: doc
-        }, "ok", 200);
+            book: result
+        }, "Book found successfully", 200);
     } catch (error) {
         next(error);
     }
 };
+
+bookController.delete = async (req, res) => {
+    try {
+        const {
+            id
+        } = req.params;
+
+        if (!id) {
+            throw {
+                name: "bad_request"
+            };
+        }
+
+        const result = await BookModel.findByIdAndDelete(id, {
+            isDeleted: true,
+        });
+
+        if (!result) {
+            throw {
+                name: "not_found"
+            }
+        }
+
+        responseJson(res, {
+            book: result
+        }, "Book delete successfully", 200);
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = bookController;
