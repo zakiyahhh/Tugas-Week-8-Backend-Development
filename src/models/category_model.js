@@ -1,4 +1,4 @@
-const mongoose = required("mongoose");
+const mongoose = require("mongoose");
 
 const categorySchema = new mongoose.Schema({
     name: {
@@ -28,6 +28,6 @@ categorySchema.set("toJSON", {
     },
 });
 
-const CategoryModel = mongoose.model("author", authorSchema);
+const CategoryModel = mongoose.model("category", categorySchema);
 
 module.exports = CategoryModel;

@@ -2,6 +2,8 @@ const express = require("express")
 const testRoutes = require("./test_routes.js")
 const authorRoutes = require("./author_routes.js");
 const bookRoutes = require("./book_routes.js");
+const categoryRoutes = require("./category_routes.js");
+
 
 const routes = express.Router()
 
@@ -9,5 +11,7 @@ const routes = express.Router()
 routes.use(testRoutes);
 routes.use(authorRoutes);
 routes.use(bookRoutes);
+routes.use(categoryRoutes);
+
 
 module.exports = routes

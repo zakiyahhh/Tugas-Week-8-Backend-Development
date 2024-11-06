@@ -1,10 +1,6 @@
-const mongoose = required("mongoose");
+const mongoose = require("mongoose");
 
 const borrowerSchema = new mongoose.Schema({
-    _id: {
-        type: mongoose.Types.ObjectId,
-        default: new mongoose.Type.ObjectId(),
-    },
     name: {
         type: String,
         required: true,
@@ -32,6 +28,6 @@ borrowerSchema.set("toJSON", {
     },
 });
 
-const BorrowerModel = mongoose.model("author", authorSchema);
+const BorrowerModel = mongoose.model("borrower", borrowerSchema);
 
 module.exports = BorrowerModel;

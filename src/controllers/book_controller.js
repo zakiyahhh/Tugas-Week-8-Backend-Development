@@ -165,6 +165,7 @@ bookController.delete = async (req, res) => {
             }
         }
 
+        result.isDeleted = true;
         responseJson(res, {
             book: result
         }, "Book delete successfully", 200);
