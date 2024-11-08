@@ -1,4 +1,5 @@
-const BookModel = require("../models/book_model.js");
+const mongoose = require("mongoose");
+const bookModel = require("../models/book_model.js");
 const {
     responseJson
 } = require("../utils/http.js");
@@ -9,23 +10,25 @@ bookController.insert = async (req, res, next) => {
     try {
         const {
             title,
-            totalStocks = 0
+            totalStocks = 0,
+            authorId,
+            categories = [],
         } = req.body;
 
-        if (!title) {
-            throw {
-                name: "bad_request",
-            };
+        if (!title || !authorId || !categories || categories.length === 0) {
+            throw new Error("Title, author, and categories are required.");
         }
 
-        const result = await BookModel.create({
+        const doc = await bookModel.create({
             title,
             totalStocks,
+            author: authorId,
+            category,
         });
 
         responseJson(res, {
-            book: result
-        }, "Book created successfully", 201);
+            book: doc
+        }, "Created successfully", 201);
     } catch (error) {
         next(error);
     }
@@ -33,12 +36,13 @@ bookController.insert = async (req, res, next) => {
 
 bookController.getAll = async (req, res, next) => {
     try {
-        const result = await BookModel.find({
+        const docs = await bookModel.find({
             isDeleted: false
-        });
+        }).populate("author", "_id name").populate("category", "_id name");
+
         responseJson(res, {
-            book: result
-        }, "Book found successfully", 200);
+            books: docs
+        }, "Books found successfully", 200);
     } catch (error) {
         next(error);
     }
@@ -47,21 +51,21 @@ bookController.getAll = async (req, res, next) => {
 bookController.upload = async (req, res, next) => {
     try {
         const {
-            imageUrl,
+            coverImageUrl,
             id
         } = req.body;
 
-        if (!imageUrl || !id) {
+        if (!coverImageUrl || !id) {
             throw {
                 name: "bad_request"
             };
         }
 
-        const result = await BookModel.findByIdAndUpdate(id, {
-            imageUrl,
-        }, {
-            isDeleted: false
-        });
+        const result = await bookModel.findByIdAndUpdate(
+            id,
+            { coverImageUrl: coverImageUrl, updatedAt: new Date() }, 
+            { new: true }
+        );
 
         if (!result) {
             throw {
@@ -69,10 +73,10 @@ bookController.upload = async (req, res, next) => {
             }
         }
 
-        result.imageUrl = imageUrl;
+        doc.imageUrl = imageUrl;
         responseJson(res, {
             book: result
-        }, "Book upload successfully", 200);
+        }, "Cover upload successfully", 200);
     } catch (error) {
         next(error);
     }
@@ -81,34 +85,51 @@ bookController.upload = async (req, res, next) => {
 bookController.update = async (req, res, next) => {
     try {
         const {
-            title
+            title,
+            totalStocks,
+            authorId,
+            categories,
         } = req.body;
         const {
             id
         } = req.params;
 
-        if (!title || !id) {
-            throw {
-                name: "bad_request"
-            };
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return responseError(res, {
+                message: "Invalid book ID."
+            }, 400);
         }
 
-        const result = await BookModel.findByIdAndUpdate(id, {
-            title,
-            isDeleted: false,
-        });
+        if (!title || !authorId || !categories || categories.length === 0) {
+            return responseError(res, {
+                message: "Title, author, and categories are required."
+            }, 400);
+        }
 
-        if (!result) {
+        const updatedBook = await bookModel.findByIdAndUpdate(
+            id, {
+                title,
+                totalStocks,
+                author: authorId,
+                categories,
+                updatedAt: new Date()
+            }, {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!updatedBook) {
             throw {
                 name: "not_found"
             }
         }
 
-        result.title = title;
         responseJson(res, {
-            book: result
+            book: doc
         }, "Book update successfully", 200);
     } catch (error) {
+        console.log(error);
         next(error);
     }
 };
@@ -125,18 +146,18 @@ bookController.getById = async (req, res, next) => {
             };
         }
 
-        const result = await BookModel.findById(id, {
+        const doc = await BookModel.findById(id, {
             isDeleted: false
         });
 
-        if (!result) {
+        if (!doc) {
             throw {
                 name: "not_found"
             }
         }
 
         responseJson(res, {
-            book: result
+            book: doc
         }, "Book found successfully", 200);
     } catch (error) {
         next(error);
@@ -155,19 +176,20 @@ bookController.delete = async (req, res) => {
             };
         }
 
-        const result = await BookModel.findByIdAndDelete(id, {
-            isDeleted: true,
-        });
+        const deletedBook = await bookModel.findByIdAndUpdate(
+            id,
+            { isDeleted: true, updatedAt: new Date() },
+            { new: true }
+        );
 
-        if (!result) {
+        if (!deletedBook) {
             throw {
                 name: "not_found"
             }
         }
 
-        result.isDeleted = true;
         responseJson(res, {
-            book: result
+            book: deletedBook
         }, "Book delete successfully", 200);
     } catch (error) {
         next(error);

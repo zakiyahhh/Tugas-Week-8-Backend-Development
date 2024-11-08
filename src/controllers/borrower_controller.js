@@ -8,10 +8,11 @@ const borrowerController = {};
 borrowerController.insert = async (req, res, next) => {
     try {
         const {
-            name
+            name,
+            email
         } = req.body;
 
-        if (!name) {
+        if (!name || !email) {
             throw {
                 name: "bad_request",
             };
@@ -19,6 +20,7 @@ borrowerController.insert = async (req, res, next) => {
 
         const result = await BorrowerModel.create({
             name,
+            email,
             isDeleted: false,
         });
 
@@ -46,21 +48,28 @@ borrowerController.getAll = async (req, res, next) => {
 borrowerController.update = async (req, res, next) => {
     try {
         const {
-            name
+            name,
+            email,
         } = req.body;
         const {
             id
         } = req.params;
 
-        if (!name || !id) {
+        if (!name && !email) {
             throw {
                 name: "bad_request"
             };
         }
 
+        const updatedData = {};
+        if (name) updatedData.name = name;
+        if (email) updatedData.email = email;
+
         const result = await BorrowerModel.findByIdAndUpdate(id, {
-            name,
-            isDeleted: false,
+            ...updatedData,
+            updatedAt: new Date()
+        }, {
+            new: true
         });
 
         if (!result) {
@@ -69,7 +78,6 @@ borrowerController.update = async (req, res, next) => {
             }
         }
 
-        result.name = name;
         responseJson(res, {
             borrower: result
         }, "Borrower update successfully", 200);
@@ -122,6 +130,9 @@ borrowerController.delete = async (req, res) => {
 
         const result = await BorrowerModel.findByIdAndDelete(id, {
             isDeleted: true,
+            updatedAt: new Date()
+        }, {
+            new: true
         });
 
         if (!result) {
@@ -129,8 +140,7 @@ borrowerController.delete = async (req, res) => {
                 name: "not_found"
             }
         }
-        
-        result.isDeleted = true;
+
         responseJson(res, {
             borrower: result
         }, "Borrower delete successfully", 200);

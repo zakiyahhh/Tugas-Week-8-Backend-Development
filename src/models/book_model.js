@@ -9,17 +9,26 @@ const bookSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    imageUrl: {
+    author: {
+        type: mongoose.Schema.Types.ObjectId, 
+        required: true, 
+        ref: 'Author' 
+    },
+    categories: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        required: true, 
+        ref: 'Category' 
+    }, ],
+    coverImageUrl: {
         type: String,
-        required: false,
     },
     createdAt: {
         type: Date,
-        default: new Date(),
+        default: Date.now, 
     },
     updatedAt: {
         type: Date,
-        default: new Date(),
+        default: Date.now, 
     },
     isDeleted: {
         type: Boolean,
@@ -27,15 +36,11 @@ const bookSchema = new mongoose.Schema({
     },
 });
 
-bookSchema.set("toJSON", {
-    transform: (doc, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
-        delete ret.__v;
-        return ret;
-    },
+bookSchema.pre('save', function(next) {
+    this.updatedAt = Date.now();
+    next();
 });
 
-const BookModel = mongoose.model("book", bookSchema);
+const BookModel = mongoose.model("Book", bookSchema);
 
 module.exports = BookModel;

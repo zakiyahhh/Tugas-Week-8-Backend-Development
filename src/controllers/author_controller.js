@@ -57,9 +57,11 @@ authorController.upload = async (req, res, next) => {
         }
 
         const result = await AuthorModel.findByIdAndUpdate(id, {
-            imageUrl,
+            imageUrl: imageUrl,
+            updatedAt: new Date(),
+            isDeleted: false,
         }, {
-            isDeleted: false
+            new: true
         });
 
         if (!result) {
@@ -68,10 +70,9 @@ authorController.upload = async (req, res, next) => {
             }
         }
 
-        result.imageUrl = imageUrl;
         responseJson(res, {
             author: result
-        }, "Author upload successfully", 200);
+        }, "Image upload successfully", 200);
     } catch (error) {
         next(error);
     }
@@ -94,7 +95,10 @@ authorController.update = async (req, res, next) => {
 
         const result = await AuthorModel.findByIdAndUpdate(id, {
             name,
+            updatedAt: new Date(),
             isDeleted: false,
+        }, {
+            new: true
         });
 
         if (!result) {
@@ -103,7 +107,6 @@ authorController.update = async (req, res, next) => {
             }
         }
 
-        result.name = name;
         responseJson(res, {
             author: result
         }, "Author update successfully", 200);
@@ -124,7 +127,7 @@ authorController.getById = async (req, res, next) => {
             };
         }
 
-        const result = await AuthorModel.findById(id, {
+        const result = AuthorModel.findById(id).where({
             isDeleted: false
         });
 
@@ -156,6 +159,9 @@ authorController.delete = async (req, res) => {
 
         const result = await AuthorModel.findByIdAndDelete(id, {
             isDeleted: true,
+            updatedAt: new Date()
+        }, {
+            new: true
         });
 
         if (!result) {

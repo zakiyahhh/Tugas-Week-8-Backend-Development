@@ -4,6 +4,7 @@ const authorRoutes = require("./author_routes.js");
 const bookRoutes = require("./book_routes.js");
 const categoryRoutes = require("./category_routes.js");
 const borrowerRoutes = require("./borrower_routes.js");
+const borrowedBookRoutes = require("./borrow_book_routes.js");
 
 const routes = express.Router()
 
@@ -13,5 +14,6 @@ routes.use(authorRoutes);
 routes.use(bookRoutes);
 routes.use(categoryRoutes);
 routes.use(borrowerRoutes);
+routes.use(borrowedBookRoutes);
 
 module.exports = routes

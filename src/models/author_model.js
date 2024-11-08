@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const authorSchema = new mongoose.Schema({
+    _id: {
+        type: mongoose.Types.ObjectId,
+        default: () => new mongoose.Types.ObjectId()
+    },
     name: {
         type: String,
         required: true,
@@ -11,11 +15,11 @@ const authorSchema = new mongoose.Schema({
     },
     createdAt: {
         type: Date,
-        default: new Date(),
+        default: Date.now,
     },
     updatedAt: {
         type: Date,
-        default: new Date(),
+        default: Date.now,
     },
     isDeleted: {
         type: Boolean,
@@ -32,6 +36,6 @@ authorSchema.set("toJSON", {
     },
 });
 
-const AuthorModel = mongoose.model("author", authorSchema);
+const AuthorModel = mongoose.model("Author", authorSchema);
 
 module.exports = AuthorModel;

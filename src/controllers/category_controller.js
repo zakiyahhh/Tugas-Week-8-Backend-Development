@@ -60,7 +60,10 @@ categoryController.update = async (req, res, next) => {
 
         const result = await CategoryModel.findByIdAndUpdate(id, {
             name,
+            updatedAt: new Date(),
             isDeleted: false,
+        }, {
+            new: true
         });
 
         if (!result) {
@@ -69,7 +72,6 @@ categoryController.update = async (req, res, next) => {
             }
         }
 
-        result.name = name;
         responseJson(res, {
             category: result
         }, "Category update successfully", 200);
@@ -91,6 +93,9 @@ categoryController.getById = async (req, res, next) => {
         }
 
         const result = await CategoryModel.findById(id, {
+            _id: id,
+            isDeleted: false
+        }, {
             isDeleted: false
         });
 
@@ -122,6 +127,9 @@ categoryController.delete = async (req, res) => {
 
         const result = await CategoryModel.findByIdAndDelete(id, {
             isDeleted: true,
+            updatedAt: new Date()
+        }, {
+            new: true
         });
 
         if (!result) {
@@ -129,8 +137,7 @@ categoryController.delete = async (req, res) => {
                 name: "not_found"
             }
         }
-        
-        result.isDeleted = true;
+
         responseJson(res, {
             category: result
         }, "Category delete successfully", 200);

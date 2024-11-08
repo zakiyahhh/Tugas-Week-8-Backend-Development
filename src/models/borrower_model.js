@@ -1,17 +1,26 @@
 const mongoose = require("mongoose");
 
 const borrowerSchema = new mongoose.Schema({
+    _id: {
+        type: mongoose.Types.ObjectId,
+        default: () => new mongoose.Types.ObjectId(),
+    },
     name: {
         type: String,
         required: true,
     },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     createdAt: {
         type: Date,
-        default: new Date(),
+        default: Date.now,
     },
     updatedAt: {
         type: Date,
-        default: new Date(),
+        default: Date.now,
     },
     isDeleted: {
         type: Boolean,
@@ -28,6 +37,6 @@ borrowerSchema.set("toJSON", {
     },
 });
 
-const BorrowerModel = mongoose.model("borrower", borrowerSchema);
+const BorrowerModel = mongoose.model("Borrower", borrowerSchema);
 
 module.exports = BorrowerModel;
