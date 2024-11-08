@@ -3,7 +3,9 @@ const {
     responseJson
 } = require("../utils/http.js");
 
-exports.borrow = async (req, res, next) => {
+const borrowedBookController = {};
+
+borrowedBookController.borrow = async (req, res, next) => {
     try {
         const {
             bookId,
@@ -14,7 +16,7 @@ exports.borrow = async (req, res, next) => {
         const borrowedBook = new BorrowedBookModel({
             book: bookId,
             borrower: borrowerId,
-            expectedReturnedAt: expected,
+            expectedReturnedAt,
         });
 
         await borrowedBook.save();
@@ -29,10 +31,14 @@ exports.borrow = async (req, res, next) => {
     }
 };
 
-exports.getActiveBorrowedBooks = async (req, res, next) => {
+borrowedBookController.getActiveBorrowedBooks = async (req, res, next) => {
     try {
-        const borrowedBooks = await BorrowedBookModel.find({ returnedAt: null }).populate('book borrower');
-        responseJson(res, { borrowedBooks }, "Active borrowed books retrieved", 200);
+        const borrowedBooks = await BorrowedBookModel.find({
+            returnedAt: null
+        }).populate('book borrower');
+        responseJson(res, {
+            borrowedBooks
+        }, "Active borrowed books retrieved", 200);
     } catch (error) {
         console.error("Error retrieving borrowed books:", error);
         responseError(res, error.message || "Failed to retrieve borrowed books", 500);
@@ -40,20 +46,28 @@ exports.getActiveBorrowedBooks = async (req, res, next) => {
     }
 };
 
-exports.returnBook = async (req, res, next) => {
+borrowedBookController.returnBook = async (req, res, next) => {
     try {
-        const { borrowedBookId } = req.body;
+        const {
+            borrowedBookId
+        } = req.body;
 
         const updatedBorrowedBook = await BorrowedBookModel.findByIdAndUpdate(
-            borrowedBookId,
-            { returnedAt: Date.now() },
-            { new: true }
+            borrowedBookId, {
+                returnedAt: Date.now()
+            }, {
+                new: true
+            }
         );
 
-        responseJson(res, { updatedBorrowedBook }, "Book returned successfully", 200);
+        responseJson(res, {
+            updatedBorrowedBook
+        }, "Book returned successfully", 200);
     } catch (error) {
         console.error("Error returning book:", error);
         responseError(res, error.message || "Failed to return book", 500);
         next(error);
     }
 };
+
+module.exports = borrowedBookController;

@@ -127,7 +127,7 @@ authorController.getById = async (req, res, next) => {
             };
         }
 
-        const result = AuthorModel.findById(id).where({
+        const result = AuthorModel.findById(id, {
             isDeleted: false
         });
 

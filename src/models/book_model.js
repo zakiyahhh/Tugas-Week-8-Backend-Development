@@ -18,8 +18,8 @@ const bookSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId, 
         required: true, 
         ref: 'Category' 
-    }, ],
-    coverImageUrl: {
+    }], 
+    coverImageUrl: { 
         type: String,
     },
     createdAt: {
